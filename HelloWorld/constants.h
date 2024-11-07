@@ -5,5 +5,6 @@
 const float ballSpeed = 3.0;
 
 enum ObjectType {
-	TYPE_BALL
+	TYPE_BALL,
+	TYPE_BRICK
 };

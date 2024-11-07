@@ -4,4 +4,5 @@
 #include "constants.h"
 
 void SpawnBall();
+void SetupScene();
 void StepFrame(float elapsedTime);
