@@ -11,8 +11,9 @@ void StepFrame(float elapsedTime) {
 
 	const std::vector<int> ballIds = Play::CollectGameObjectIDsByType(TYPE_BALL);
 	
-	for (int id : ballIds) {
-		Play::DrawObject(Play::GetGameObject(TYPE_BALL));
+	for (int i = 0; i < ballIds.size(); i++) {
+		GameObject& Ball(Play::GetGameObject(ballIds[i]));
+		Play::DrawObject(Ball);
 		
 	}
 }
