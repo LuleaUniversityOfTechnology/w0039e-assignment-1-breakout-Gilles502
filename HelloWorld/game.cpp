@@ -2,23 +2,31 @@
 #define PLAY_USING_GAMEOBJECT_MANAGER
 #include "Play.h"
 #include "game.h"
+#include "Paddle.h"
+
+Paddle p;
+
 
 void SpawnBall() {
-	const int objectId = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 200 }, 4, "ball");
+	const int objectId = Play::CreateGameObject(ObjectType::TYPE_BALL, { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 200 }, 8, "ball");
 	GameObject& ball = Play::GetGameObject(objectId);
 	ball.velocity = normalize({ 1, -1 }) * ballSpeed;
 }
 
 void SetupScene() {
-	for (int x = 0; x < 35; x++){
+	for (int x = 0; x < DISPLAY_WIDTH / 18; x++) {
 		for (int y = 1; y <= 8; y++){
-			Play::CreateGameObject(ObjectType::TYPE_BRICK, { (x * 18) + 2 , DISPLAY_HEIGHT - (y * 12)}, 8, "brick");
+			Play::CreateGameObject(ObjectType::TYPE_BRICK, { (x * 18) , DISPLAY_HEIGHT - (y * 12)}, 8, "brick");
 		}
 	}
+	p.tlx = DISPLAY_WIDTH/2;
+	p.tly = 30;
+	p.brx = (DISPLAY_WIDTH / 2)+(DISPLAY_WIDTH / 6);
+	p.bry = 45;
 }
 
 void StepFrame(float elapsedTime) {
-
+	
 	const std::vector<int> ballIds = Play::CollectGameObjectIDsByType(TYPE_BALL);
 	for (int i = 0; i < ballIds.size(); i++) {
 		GameObject& ball(Play::GetGameObject(ballIds[i]));
@@ -33,6 +41,10 @@ void StepFrame(float elapsedTime) {
 		}
 		else if (ball.pos.y >= DISPLAY_HEIGHT - ball.radius) {
 			ball.velocity.y = -(ball.velocity.y);
+		}
+		else if (IsColliding(p, ball))
+		{
+			ball.velocity.y = -(ball.velocity.y);;
 		}
 		Play::UpdateGameObject(ball);
 		Play::DrawObject(ball);
@@ -56,4 +68,7 @@ void StepFrame(float elapsedTime) {
 		}
 
 	}
+	updatePaddle(p);
+	DrawPaddle(p);
+	
 }
