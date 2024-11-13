@@ -8,11 +8,11 @@ void DrawPaddle(Paddle& paddle) {
 	Play::DrawRect(bottomLeft, topRight, Play::cRed, true);
 }
 void updatePaddle(Paddle& paddle) {
-	if (Play::KeyDown(Play::KeyboardButton(VK_LEFT))) {
+	if (Play::KeyDown(Play::KeyboardButton(VK_LEFT))) { //if the player press the left arrow key it move the paddle on the x-axis 
 		paddle.brx -= 5;
 		paddle.tlx -= 5;
 	}
-	if (Play::KeyDown(Play::KeyboardButton(VK_RIGHT))) {
+	if (Play::KeyDown(Play::KeyboardButton(VK_RIGHT))) {//if the player press the right arrow key it move the paddle on the x-axis
 		paddle.brx += 5;
 		paddle.tlx += 5;
 	}
