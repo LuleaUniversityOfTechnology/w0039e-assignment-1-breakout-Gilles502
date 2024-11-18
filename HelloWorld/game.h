@@ -7,3 +7,4 @@
 void SpawnBall();
 void SetupScene();
 void StepFrame(float elapsedTime);
+void hud();
