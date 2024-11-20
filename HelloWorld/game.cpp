@@ -5,8 +5,9 @@
 #include "Paddle.h"
 
 Paddle p;
-
-unsigned int highScore[5] = {0,0,0,0,0};
+int s = 5;
+int c = 0;
+int* highScore = new int[s];
 int score = 0;
 
 
@@ -21,12 +22,58 @@ void hud() {
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH / 10, DISPLAY_HEIGHT / 10), std::to_string(score).c_str());
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - (DISPLAY_WIDTH / 12), DISPLAY_HEIGHT - (DISPLAY_HEIGHT /2)), "High Score:");
 	for (int i = 0; i < 5; i++) {
-		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH-(DISPLAY_WIDTH / 12), DISPLAY_HEIGHT-(DISPLAY_HEIGHT / 2)-space), std::to_string(highScore[i]).c_str());
+		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - (DISPLAY_WIDTH / 12), DISPLAY_HEIGHT - (DISPLAY_HEIGHT / 2) - space), std::to_string(highScore[i]).c_str());
 		space += 20;
 	}
+}
+void savefile() {
 	
-	
+	std::ofstream file("highscore.txt");
+	if (file.is_open()) {
+		for (int i = 0; i < s; i++) {
+			file << highScore[i]<<"\n";
+		}
+		file.close();
+	}
+	else {
+		std::cerr << "File error.\n";
+	}
+	delete[] highScore;
+}
+void loadfile() {
+	for (int i = 0; i < s; ++i) {
+		highScore[i] = 0;
+	}
+	std::ifstream file("highscore.txt");
+	if (file.is_open()) {
+		c = 0;
+		std::string row;
+		while (std::getline(file, row)) {
+			if (row.empty()) {
+				break;
+			}
+			if (c == s) {
+				incrementsize();
+			}
+			int hs = std::stoi(row);
+			highScore[c]=hs; 
+			c++;
+		}
+		file.close();  
+	}
+	else {
+		std::cerr << "File error.\n";
+	}
 
+}
+void incrementsize() {
+	s ++;
+	int* hstemp = new int[s];
+	for (int i = 0; i < c; i++) {
+		hstemp[i] = highScore[i];
+	}
+	delete[] highScore;
+	highScore = hstemp;
 }
 
 void SetupScene() {
@@ -39,6 +86,7 @@ void SetupScene() {
 	p.tly = 30;
 	p.brx = (DISPLAY_WIDTH / 2)+(DISPLAY_WIDTH / 6);////same as the number of brick,i used the display width so it scale with the resolution
 	p.bry = 45;
+
 }
 
 void StepFrame(float elapsedTime) {
@@ -76,17 +124,23 @@ void StepFrame(float elapsedTime) {
 		}
 		else if (IsColliding(p, ball))//collision with paddle
 		{
+			int r = rand() % 6;
 			ball.velocity.y = -(ball.velocity.y);
-			ball.velocity.x = ball.velocity.x + (rand() % 6);
-			
+			ball.velocity.x = ball.velocity.x + r;
+			std::cout << r;
+
 		}
 		else if (ball.pos.y <= 0) {
-			for (int i = 0; i < 5; i++) {
-				int hs = highScore[i];
+			int y = 0;
+			for (y = 0; y < s; y++) {
+				int hs = highScore[y];
 				if (score > hs) {
-					highScore[i] = score;
+					highScore[y] = score;
 					score = hs;
-				}	
+				}
+			}
+			if (s == 0) {
+				highScore[0] = score;
 			}
 			Play::DestroyGameObject(ballIds[i]);
 			for (int i = 0; i < brickIds.size(); i++) {
@@ -99,7 +153,7 @@ void StepFrame(float elapsedTime) {
 		}
 		Play::UpdateGameObject(ball);
 		Play::DrawObject(ball);
-		
+
 	}
 	updatePaddle(p);
 	DrawPaddle(p);

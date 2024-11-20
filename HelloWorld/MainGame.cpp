@@ -6,6 +6,7 @@ void MainGameEntry( PLAY_IGNORE_COMMAND_LINE )
 	Play::CreateManager( DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_SCALE );
 	SpawnBall();
 	SetupScene();
+	loadfile();
 }
 
 // Called by PlayBuffer every frame (60 times a second!)
@@ -21,5 +22,6 @@ bool MainGameUpdate( float elapsedTime )
 int MainGameExit( void )
 {
 	Play::DestroyManager();
+	savefile();
 	return PLAY_OK;
 }
