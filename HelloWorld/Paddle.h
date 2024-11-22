@@ -3,10 +3,10 @@
 
 struct Paddle {
 
-	int tlx;
-	int tly;
-	int brx;
-	int bry;
+	int tlx; //top left x
+	int tly; //top left y
+	int brx; //bottom right x
+	int bry; //bottom left x
 
 };
 

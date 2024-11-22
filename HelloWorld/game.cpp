@@ -5,10 +5,11 @@
 #include "Paddle.h"
 
 Paddle p;
-int s = 5;
-int c = 0;
-int* highScore = new int[s];
-int score = 0;
+int cc = 0;//counter for when a new highscore is set(a turn counter basically)
+int s = 5; //starting size and generally the size of the array
+int c = 0; // counter for current size 
+int* highScore = new int[s];//array for the highscore
+int score = 0; //score of the player
 
 
 void SpawnBall() {
@@ -18,10 +19,11 @@ void SpawnBall() {
 }
 
 void hud() {
-	int space = 30;
+	int space = 30; 
+	//Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH / 9, DISPLAY_HEIGHT / 9 + 200), std::to_string(c).c_str()); //used for debug(show current size array)
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH / 10, DISPLAY_HEIGHT / 10), std::to_string(score).c_str());
 	Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - (DISPLAY_WIDTH / 12), DISPLAY_HEIGHT - (DISPLAY_HEIGHT /2)), "High Score:");
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++) { // use the loop to print only the best 5 highscore
 		Play::DrawDebugText(Play::Point2D(DISPLAY_WIDTH - (DISPLAY_WIDTH / 12), DISPLAY_HEIGHT - (DISPLAY_HEIGHT / 2) - space), std::to_string(highScore[i]).c_str());
 		space += 20;
 	}
@@ -31,7 +33,7 @@ void savefile() {
 	std::ofstream file("highscore.txt");
 	if (file.is_open()) {
 		for (int i = 0; i < s; i++) {
-			file << highScore[i]<<"\n";
+			file << highScore[i]<<"\n"; //save the highscore on the file
 		}
 		file.close();
 	}
@@ -40,24 +42,24 @@ void savefile() {
 	}
 	delete[] highScore;
 }
-void loadfile() {
+void loadfile() { // function for loading the file
 	for (int i = 0; i < s; ++i) {
-		highScore[i] = 0;
+		highScore[i] = 0; //initialize the array so is not full of random trash memory
 	}
 	std::ifstream file("highscore.txt");
 	if (file.is_open()) {
-		c = 0;
+		c = 0; // i reset the currentsize
 		std::string row;
 		while (std::getline(file, row)) {
 			if (row.empty()) {
 				break;
 			}
 			if (c == s) {
-				incrementsize();
+				incrementsize(); //if the array is full,i call the function to increase the size
 			}
 			int hs = std::stoi(row);
-			highScore[c]=hs; 
-			c++;
+			highScore[c]=hs;
+			c++; // every iteration i increse the currentisize
 		}
 		file.close();  
 	}
@@ -66,7 +68,7 @@ void loadfile() {
 	}
 
 }
-void incrementsize() {
+void incrementsize() { //algorithm to increment size of the array
 	s ++;
 	int* hstemp = new int[s];
 	for (int i = 0; i < c; i++) {
@@ -105,7 +107,7 @@ void StepFrame(float elapsedTime) {
 			if (Play::IsColliding(ball, brick)) { //collision with brick
 				Play::DestroyGameObject(brickIds[i]);
 				ball.velocity.y = -(ball.velocity.y);
-				score++;
+				score++;//+1 on the score if a brick is destroyed
 
 			}
 		}
@@ -124,30 +126,33 @@ void StepFrame(float elapsedTime) {
 		}
 		else if (IsColliding(p, ball))//collision with paddle
 		{
-			int r = rand() % 6;
+			int r = rand() % 6; //used to randomize a little bit the velocity of the ball so it was easier to test the game
 			ball.velocity.y = -(ball.velocity.y);
 			ball.velocity.x = ball.velocity.x + r;
-			std::cout << r;
 
 		}
 		else if (ball.pos.y <= 0) {
-			int y = 0;
-			for (y = 0; y < s; y++) {
+			cc++;
+			if (c == s) { //if the currentsize is the same as the size of the array you use the function to increment the size of the array
+				incrementsize();
+				c++; //after that i add 1 to the current size
+			}
+			for (int y = 0; y < s; y++) { //this is the sorting algorithm
 				int hs = highScore[y];
 				if (score > hs) {
 					highScore[y] = score;
 					score = hs;
 				}
 			}
-			if (s == 0) {
-				highScore[0] = score;
+			if ((c + cc) == s){ //i use this function to see if the turn + currentsize id equal to the size of the array
+				c += cc;//if is the case i set the currentsize to the size of the array so next turn it will increment(as in this case the array will be full)
 			}
-			Play::DestroyGameObject(ballIds[i]);
+			Play::DestroyGameObject(ballIds[i]);//i destroy the ball
 			for (int i = 0; i < brickIds.size(); i++) {
-				Play::DestroyGameObject(brickIds[i]);
+				Play::DestroyGameObject(brickIds[i]); //and the brick
 			}
-			score = 0;
-			SetupScene();
+			score = 0; //reset the score
+			SetupScene();//setup again the scene and the ball
 			SpawnBall();
 			break;
 		}
@@ -157,5 +162,5 @@ void StepFrame(float elapsedTime) {
 	}
 	updatePaddle(p);
 	DrawPaddle(p);
-	hud();
+	hud();//hud used to displat the score and the highscore
 }

@@ -3,13 +3,13 @@
 
 
 void DrawPaddle(Paddle& paddle) {
-	Play::Point2D bottomLeft = Play::Point2D(paddle.tlx, paddle.tly);
-	Play::Point2D topRight = Play::Point2D(paddle.brx, paddle.bry);
-	Play::DrawRect(bottomLeft, topRight, Play::cRed, true);
+	Play::Point2D topLeft = Play::Point2D(paddle.tlx, paddle.tly);
+	Play::Point2D bottomRight = Play::Point2D(paddle.brx, paddle.bry);
+	Play::DrawRect(topLeft, bottomRight, Play::cRed, true);
 }
 void updatePaddle(Paddle& paddle) {
 	if (Play::KeyDown(Play::KeyboardButton(VK_LEFT))) { //if the player press the left arrow key it move the paddle on the x-axis 
-		paddle.brx -= 5;
+		paddle.brx -= 5; 
 		paddle.tlx -= 5;
 	}
 	if (Play::KeyDown(Play::KeyboardButton(VK_RIGHT))) {//if the player press the right arrow key it move the paddle on the x-axis
@@ -18,10 +18,10 @@ void updatePaddle(Paddle& paddle) {
 	}
 }
 bool IsColliding(Paddle& paddle, Play::GameObject& obj) {
-	Play::Point2D bottomLeft = Play::Point2D(paddle.tlx, paddle.tly);
-	Play::Point2D topRight = Play::Point2D(paddle.brx, paddle.bry);
-	const float dx = obj.pos.x - max(bottomLeft.x, min(obj.pos.x, topRight.x));
-	const float dy = obj.pos.y - max(bottomLeft.y, min(obj.pos.y, topRight.y));
+	Play::Point2D topLeft = Play::Point2D(paddle.tlx, paddle.tly);
+	Play::Point2D bottomRight = Play::Point2D(paddle.brx, paddle.bry);
+	const float dx = obj.pos.x - max(topLeft.x, min(obj.pos.x, bottomRight.x));
+	const float dy = obj.pos.y - max(topLeft.y, min(obj.pos.y, bottomRight.y));
 	return (dx * dx + dy * dy) < (obj.radius * obj.radius);
 }
 float max(float x, float y)
